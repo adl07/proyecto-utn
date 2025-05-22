@@ -1,4 +1,3 @@
-import { Schema, model } from "mongoose";
 import {z} from 'zod'
 
 
@@ -12,15 +11,3 @@ export const userSchemaZod = z.object({
         message: "La contraseña deber contener un caracter especial"
     })
 })
-
-const userShcema = new Schema({
-        username:{type: String, required: true, unique: true},
-        password:{type: String, required: true}
-
-},{
-    versionKey: false
-})
-
-const User = model("User", userShcema)
-
-export{ User }

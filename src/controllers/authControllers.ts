@@ -2,18 +2,27 @@ import { Response, Request, json } from "express";
 import { User } from "../models/userModel";
 import bcrypt from "bcryptjs"
 import Jwt  from "jsonwebtoken";
+import { userSchemaZod } from "../schemas/validationSchemaRegister";
 
 
 class AuthController{
     static async Register(req: Request, res: Response): Promise<any>{
         try {
-            const body = req.body
-        const {username, password} = body
+        const result = userSchemaZod.safeParse(req.body)
 
-        if(!username || !password) res.status(400).json({success: false, message: "bad request"})
+        if(!result.success){
+                const errors = result.error.format();
+                return res.status(400).json({
+                    success: false,
+                    message: "Validación fallida",
+                    errors,
+                })
+            }
 
+        const {username, password} = result.data
         
         const hash = await bcrypt.hash(password, 10)
+
         const newUser = new User({username, password: hash})
         await newUser.save()
         res.status(201).json({success: true, data: {_id: newUser._id, username: newUser.username}})
